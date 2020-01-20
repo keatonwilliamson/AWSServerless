@@ -29,6 +29,10 @@ namespace AWSServerless1
 
             // Add S3 to the ASP.NET Core dependency injection framework.
             services.AddAWSService<Amazon.S3.IAmazonS3>();
+
+            //CORS
+            services.AddCors();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
@@ -45,6 +49,10 @@ namespace AWSServerless1
 
             app.UseHttpsRedirection();
             app.UseMvc();
+
+            //CORS
+            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
         }
     }
 }
