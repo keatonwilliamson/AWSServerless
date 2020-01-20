@@ -52,13 +52,11 @@ namespace AWSServerless1.Controllers
 using Microsoft.Extensions.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Web.Http.Cors;
 
 namespace AWSServerless1.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class PokemonController : ControllerBase
     {
         private readonly IConfiguration _config;
@@ -104,7 +102,10 @@ namespace AWSServerless1.Controllers
                         pokemonList.Add(pokemon);
                     }
                     reader.Close();
-
+                    Response.Headers.Add("X-Requested-With", "*");
+                    Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with");
+                    Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                    Response.Headers.Add("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
                     return Ok(pokemonList);
                 }
             }

@@ -25,13 +25,14 @@ namespace AWSServerless1
         // This method gets called by the runtime. Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
         {
+
+            //CORS make sure you call this previously to addmvc
+            services.AddCors();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             // Add S3 to the ASP.NET Core dependency injection framework.
             services.AddAWSService<Amazon.S3.IAmazonS3>();
-
-            //CORS
-            services.AddCors();
 
         }
 
@@ -47,11 +48,13 @@ namespace AWSServerless1
                 app.UseHsts();
             }
 
+            app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod());
+
             app.UseHttpsRedirection();
             app.UseMvc();
 
             //CORS
-            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+           // app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
         }
     }
