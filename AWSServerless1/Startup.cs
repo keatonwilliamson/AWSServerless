@@ -27,7 +27,7 @@ namespace AWSServerless1
         {
 
             //CORS make sure you call this previously to addmvc
-            services.AddCors();
+           // services.AddCors();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -48,7 +48,7 @@ namespace AWSServerless1
                 app.UseHsts();
             }
 
-            app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod());
+           // app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod());
 
             app.UseHttpsRedirection();
             app.UseMvc();

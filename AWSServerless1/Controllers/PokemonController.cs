@@ -106,6 +106,7 @@ namespace AWSServerless1.Controllers
                     Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with");
                     Response.Headers.Add("Access-Control-Allow-Origin", "*");
                     Response.Headers.Add("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
+                   // Response.Headers.Add("Access-Control-Allow-Credentials", "true");
                     return Ok(pokemonList);
                 }
             }
