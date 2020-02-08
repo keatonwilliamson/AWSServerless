@@ -112,9 +112,9 @@ namespace AWSServerless1.Controllers
             }
         }
 
-        /*
+      
 
-        [HttpGet("{id}", Name = "GetCoffee")]
+        [HttpGet("{id}", Name = "GetPokemon")]
         public async Task<IActionResult> Get([FromRoute] int id)
         {
             using (SqlConnection conn = Connection)
@@ -122,55 +122,75 @@ namespace AWSServerless1.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"
-                        SELECT
-                            Id, Title, BeanType
-                        FROM Coffee
-                        WHERE Id = @id";
+                    cmd.CommandText = @"SELECT Id, PokemonSpecies, Nickname, PokedexId, PictureUrl, KeyCaught, DateCaught FROM Pokemon  WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = await cmd.ExecuteReaderAsync();
 
-                    Coffee coffee = null;
+                    Pokemon pokemon = null;
 
                     if (reader.Read())
                     {
-                        coffee = new Coffee
+                        pokemon = new Pokemon
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            Title = reader.GetString(reader.GetOrdinal("Title")),
-                            BeanType = reader.GetString(reader.GetOrdinal("BeanType"))
+                            PokemonSpecies = reader.GetString(reader.GetOrdinal("PokemonSpecies")),
+                            Nickname = reader.GetString(reader.GetOrdinal("Nickname")),
+                            PokedexId = reader.GetInt32(reader.GetOrdinal("PokedexId")),
+                            PictureUrl = reader.GetString(reader.GetOrdinal("PictureUrl")),
+                            KeyCaught = reader.GetInt32(reader.GetOrdinal("KeyCaught")),
+                            DateCaught = reader.GetDateTime(reader.GetOrdinal("DateCaught")),
                         };
                     }
                     reader.Close();
+                    Response.Headers.Add("X-Requested-With", "*");
+                    Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with");
+                    Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                    Response.Headers.Add("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
 
-                    return Ok(coffee);
+                    return Ok(pokemon);
                 }
             }
         }
 
+
+     
+
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Coffee coffee)
+        public async Task<IActionResult> Post([FromBody] Pokemon pokemon)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Coffee (Title, BeanType)
+                    cmd.CommandText = @"INSERT INTO Pokemon (PokemonSpecies, Nickname, PokedexId, PictureUrl, KeyCaught, DateCaught)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@title, @beanType)";
-                    cmd.Parameters.Add(new SqlParameter("@title", coffee.Title));
-                    cmd.Parameters.Add(new SqlParameter("@beanType", coffee.BeanType));
+                                        VALUES (@pokemonSpecies, @nickname, @pokedexId, @pictureUrl, @keyCaught, GETDATE())";
+                    cmd.Parameters.Add(new SqlParameter("@pokemonSpecies", pokemon.PokemonSpecies));
+                    cmd.Parameters.Add(new SqlParameter("@nickname", pokemon.Nickname));
+                    cmd.Parameters.Add(new SqlParameter("@pokedexId", pokemon.PokedexId));
+                    cmd.Parameters.Add(new SqlParameter("@pictureUrl", pokemon.PictureUrl));
+                    cmd.Parameters.Add(new SqlParameter("@keyCaught", pokemon.KeyCaught));
 
                     int newId = (int)await cmd.ExecuteScalarAsync();
-                    coffee.Id = newId;
-                    return CreatedAtRoute("GetCoffee", new { id = newId }, coffee);
+                    pokemon.Id = newId;
+
+                    Response.Headers.Add("X-Requested-With", "*");
+                    Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with");
+                    Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                    Response.Headers.Add("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
+                    // return CreatedAtRoute("GetPokemon", new { id = newId }, pokemon);
+                    return Ok(new { id = newId });
                 }
             }
         }
 
+
+
+        
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Coffee coffee)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Pokemon pokemon)
         {
             try
             {
@@ -179,15 +199,18 @@ namespace AWSServerless1.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE Coffee
-                                            SET Title = @title,
-                                                BeanType = @beanType
+                        cmd.CommandText = @"UPDATE Pokemon
+                                            SET Nickname = @nickName                    
                                             WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@title", coffee.Title));
-                        cmd.Parameters.Add(new SqlParameter("@beanType", coffee.BeanType));
+                        cmd.Parameters.Add(new SqlParameter("@nickName", pokemon.Nickname));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
-
                         int rowsAffected = await cmd.ExecuteNonQueryAsync();
+
+                        Response.Headers.Add("X-Requested-With", "*");
+                        Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type,X-Amz-Date,Authorization,X-Api-Key,x-requested-with");
+                        Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                        Response.Headers.Add("Access-Control-Allow-Methods", "POST,GET,OPTIONS");
+
                         if (rowsAffected > 0)
                         {
                             return new StatusCodeResult(StatusCodes.Status204NoContent);
@@ -198,6 +221,7 @@ namespace AWSServerless1.Controllers
             }
             catch (Exception)
             {
+                /*
                 if (!CoffeeExists(id))
                 {
                     return NotFound();
@@ -206,8 +230,15 @@ namespace AWSServerless1.Controllers
                 {
                     throw;
                 }
+                */
+                throw;
             }
         }
+
+
+
+
+        /*
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
